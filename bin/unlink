@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+cd "$(git rev-parse --show-toplevel)" || exit 1
+
 ALFRED_CONFIG_PATH="$(cat "$HOME/Library/Application Support/Alfred/prefs.json" | jq '.current' -r)"
 
 if [[ -z "$ALFRED_CONFIG_PATH" ]]; then
@@ -7,4 +9,6 @@ if [[ -z "$ALFRED_CONFIG_PATH" ]]; then
   exit 1
 fi
 
-rm -f "$ALFRED_CONFIG_PATH/workflows/alfred-pj-dev"
+DIR_NAME="$(basename "$(pwd)")"
+
+rm -f "$ALFRED_CONFIG_PATH/workflows/$DIR_NAME"
