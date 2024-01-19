@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 # encoding: utf-8
 
-import json
 import os
 import glob
 import sys
