@@ -5,11 +5,14 @@ import json
 import os
 import glob
 import sys
+import json
 from shutil import which
 
 sys.path.insert(1, os.path.abspath("./lib"))
 
 from lib import click
+
+usage_data = None
 
 response = {
     "items": [],
@@ -24,13 +27,39 @@ editors = {
     "pycharm": {"name": "PyCharm", "available": bool(which("pycharm")), "icon": {"path": "images/pycharm.svg"}},
 }
 
+class UsageData:
+    def __init__(self):
+        alfred_data_dir = os.getenv('alfred_workflow_data')
+        if not os.path.isdir(alfred_data_dir):
+            os.mkdir(alfred_data_dir)
+        usage_file = os.path.join(alfred_data_dir, 'usage.json')
+        self.file = usage_file
+        self.data = self.read_data()
+        
+    def read_data(self):
+        if os.path.isfile(self.file):
+            with open(self.file, 'r') as f:
+                return json.load(f)
+        return {}
+    
+    def write_data(self):
+        with open(self.file, 'w+') as f:
+            json.dump(self.data, f)
+        
+    def add_usage(self, path, count = 1):
+        self.data[path] = self.data[path] + count if path in self.data else count
+                
+    def get_usage_by_path(self, path):
+        return self.data[path] if path in self.data else 0
+
 class ResponseItem:
-    def __init__(self, title, subtitle, arg, icon, score=0):
+    def __init__(self, title, subtitle, arg, icon, calls = 0, score=0):
         self.title = title
         self.subtitle = subtitle
         self.arg = arg
         self.match = title.lower() + " " + subtitle.lower()
         self.icon = icon
+        self.calls = calls
         self.score = score
 
 @click.group()
@@ -40,6 +69,8 @@ def cli():
 @cli.command()
 @click.option('--paths', required=True, type=str, help='Project paths.')
 def list(paths):
+    usage = UsageData()
+    
     projectPaths = paths.split(",");
     for projectPath in projectPaths:
         abspath = os.path.abspath(os.path.expanduser(projectPath))
@@ -50,12 +81,14 @@ def list(paths):
                 editor_info = editors[editor_code]
                 response["items"].append(
                     ResponseItem(
-                        folder,
-                        "Open " + folderPath + " in " + editor_info["name"],
-                        folderPath,
-                        editor_info["icon"]
+                        title=folder,
+                        subtitle="Open " + folderPath + " in " + editor_info["name"],
+                        arg=folderPath,
+                        icon=editor_info["icon"],
+                        calls=usage.get_usage_by_path(folderPath),
                     )
                 )
+    response["items"] = sorted(response["items"], key=lambda item : item.calls, reverse=True)
     print(json.dumps(response, default=lambda o: o.__dict__))
 
 
@@ -64,6 +97,13 @@ def list(paths):
 def ide(path):
     click.echo(determine_editor(path))
 
+@cli.command()
+@click.option('--path', required=True, type=click.Path(), help='Project path.')
+def record_selection(path):
+    usage = UsageData()
+    usage.add_usage(path)
+    usage.write_data()
+                
 def get_first_available_editor(editor_codes):
     for editor_code in editor_codes:
         if editors[editor_code]["available"]:
