@@ -73,6 +73,19 @@
 				<false/>
 			</dict>
 		</array>
+		<key>E9F5373F-CA55-46DA-BC83-099C502EFA69</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>E9785708-034F-40AC-9604-D4A944742625</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
 	</dict>
 	<key>createdby</key>
 	<string>Illia Grybkov</string>
@@ -94,7 +107,7 @@
 				<key>script</key>
 				<string>project=$1
 
-IDE="$(python3 ./main.py ide --path "$project")"
+IDE="$(python3 ./main.py editor --path "$project")"
 
 $IDE "$project"</string>
 				<key>scriptargtype</key>
@@ -293,6 +306,50 @@ open "$project"</string>
 			<key>version</key>
 			<integer>2</integer>
 		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>concurrently</key>
+				<false/>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>script</key>
+				<string>python3 ./main.py clear-usage</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>type</key>
+				<integer>11</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>E9785708-034F-40AC-9604-D4A944742625</string>
+			<key>version</key>
+			<integer>2</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>argumenttype</key>
+				<integer>2</integer>
+				<key>keyword</key>
+				<string>pjclear</string>
+				<key>subtext</key>
+				<string></string>
+				<key>text</key>
+				<string>PJ: Clear usage data</string>
+				<key>withspace</key>
+				<false/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.keyword</string>
+			<key>uid</key>
+			<string>E9F5373F-CA55-46DA-BC83-099C502EFA69</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
 	</array>
 	<key>readme</key>
 	<string></string>
@@ -356,6 +413,20 @@ open "$project"</string>
 			<real>185</real>
 			<key>ypos</key>
 			<real>640</real>
+		</dict>
+		<key>E9785708-034F-40AC-9604-D4A944742625</key>
+		<dict>
+			<key>xpos</key>
+			<real>365</real>
+			<key>ypos</key>
+			<real>830</real>
+		</dict>
+		<key>E9F5373F-CA55-46DA-BC83-099C502EFA69</key>
+		<dict>
+			<key>xpos</key>
+			<real>50</real>
+			<key>ypos</key>
+			<real>835</real>
 		</dict>
 	</dict>
 	<key>userconfigurationconfig</key>
