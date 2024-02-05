@@ -18,7 +18,7 @@ class Logger(logging.Logger):
     def __init__(self, name):
         super().__init__(name)
         self.addHandler(logging.StreamHandler(sys.stderr))
-        self.setLevel(logging.DEBUG if os.environ['alfred_debug'] else logging.INFO)
+        self.setLevel(logging.DEBUG if ("alfred_debug" in os.environ and os.environ['alfred_debug'] == 1) else logging.INFO)
         self.log(logging.INFO, f"logger initiated")
 
 logger = Logger(__name__)
@@ -71,7 +71,7 @@ class Editors:
     }
 
     def __init__(self):
-        self.default_editor = os.environ['DEFAULT_EDITOR'] or "code"
+        self.default_editor = os.environ['DEFAULT_EDITOR'] if ('DEFAULT_EDITOR' in os.environ and os.environ['DEFAULT_EDITOR']) else "code"
 
     def get_editor(self, editor_code):
         return self.editors[editor_code]
