@@ -6,10 +6,21 @@ import glob
 import sys
 import json
 from shutil import which
+import logging
 
 sys.path.insert(1, os.path.abspath("./lib"))
 
 from lib import click
+
+
+class Logger(logging.Logger):
+    def __init__(self, name):
+        super().__init__(name)
+        self.addHandler(logging.StreamHandler(sys.stderr))
+        self.setLevel(logging.DEBUG)
+        self.log(logging.INFO, f"logger initiated")
+
+logger = Logger(__name__)
 
 usage_data = None
 
@@ -55,10 +66,12 @@ class Editors:
         "phpstorm": {"name": "PHPStorm", "available": bool(which("phpstorm")), "icon": {"path": "images/phpstorm.svg"}},
         "webstorm": {"name": "WebStorm", "available": bool(which("webstorm")), "icon": {"path": "images/webstorm.svg"}},
         "pycharm": {"name": "PyCharm", "available": bool(which("pycharm")), "icon": {"path": "images/pycharm.svg"}},
+        "goland": {"name": "GoLand", "available": bool(which("goland")), "icon": {"path": "images/goland.svg"}},
+        "rustrover": {"name": "RustRover", "available": bool(which("rustrover")), "icon": {"path": "images/rustrover.svg"}},
     }
 
     def __init__(self):
-        self.default_editor = "code"
+        self.default_editor = os.environ['DEFAULT_EDITOR'] or "code"
 
     def get_editor(self, editor_code):
         return self.editors[editor_code]
@@ -69,18 +82,43 @@ class Editors:
                 return editor_code
         return self.default_editor
 
+    def get_editors_from_environment(self, env_var_name, defaults):
+        editors = os.environ[env_var_name]
+        if not editors:
+            return defaults
+        return map(lambda editor: editor.strip(), editors.lower().split(","))
+
     def determine_editor(self, path):
+        # this project has existing vscode configuration
+        # and no idea configuration, so we assume vscode is the default
         if not os.path.isdir(os.path.join(path, '.idea')) and os.path.isdir(os.path.join(path, '.vscode')):
             return self.get_first_available_editor(['code'])
+
+        # it has maven file, so it's java
         if os.path.isfile(f"{path}/pom.xml"):
-            # it has maven file, so it's java
-            return self.get_first_available_editor(['idea'])
-        elif os.path.isfile(f"{path}/composer.json") or len(glob.glob(f"{path}/*.php")) > 0:
-            return self.get_first_available_editor(['phpstorm'])
-        elif os.path.isfile(f"{path}/requirements.txt") or len(glob.glob(f"{path}/*.py")) > 0:
-            return self.get_first_available_editor(['pycharm', 'code'])
-        elif os.path.isfile(f"{path}/package.json") or len(glob.glob(f"{path}/*.js")) > 0:
-            return self.get_first_available_editor(['webstorm', 'phpstorm', 'idea'])
+            return self.get_first_available_editor(self.get_editors_from_environment('EDITORS_JAVA', ['idea']))
+
+        # it has composer file, so it's php
+        if os.path.isfile(f"{path}/composer.json") or len(glob.glob(f"{path}/*.php")) > 0:
+            return self.get_first_available_editor(self.get_editors_from_environment('EDITORS_PHP', ['phpstorm', 'idea', 'code']))
+
+        # it has requirements file, so it's python
+        if os.path.isfile(f"{path}/requirements.txt") or len(glob.glob(f"{path}/*.py")) > 0:
+            return self.get_first_available_editor(self.get_editors_from_environment('EDITORS_PYTHON', ['pycharm', 'idea', 'code']))
+
+        # it has package.json file, so it's node/javascript
+        if os.path.isfile(f"{path}/package.json") or len(glob.glob(f"{path}/*.js")) > 0:
+            return self.get_first_available_editor(self.get_editors_from_environment('EDITORS_JAVASCRIPT', ['webstorm', 'phpstorm', 'idea', 'code']))
+
+        # it has go.mod file, so it's golang
+        if os.path.isfile(f"{path}/go.mod") or len(glob.glob(f"{path}/*.go")) > 0:
+            return self.get_first_available_editor(self.get_editors_from_environment('EDITORS_GO', ['goland', 'idea', 'code']))
+
+        # it has Cargo.toml file, so it's rust
+        if os.path.isfile(f"{path}/Cargo.toml") or len(glob.glob(f"{path}/*.rs")) > 0:
+            return self.get_first_available_editor(self.get_editors_from_environment('EDITORS_RUST', ['rustrover', 'idea', 'code']))
+
+        # We don't know what it is, so we use the default editor
         return self.default_editor
 
 
