@@ -111,7 +111,7 @@ class Editors:
             return self.get_first_available_editor(self.get_editors_from_environment('EDITORS_PHP', ['phpstorm', 'idea', 'code']))
 
         # it has jupyter notebook file, so it's jupyter
-        if len(glob.glob(f"{path}/*.ipnb")) > 0:
+        if len(glob.glob(f"{path}/*.ipynb")) > 0:
             return self.get_first_available_editor(self.get_editors_from_environment(['EDITORS_JUPYTER', 'EDITORS_PYTHON'], ['pycharm', 'idea', 'code']))
 
         # it has requirements file, so it's python
@@ -164,6 +164,7 @@ def list(paths):
                 editors = Editors()
                 editor_code = editors.determine_editor(folderPath)
                 editor_info = editors.editors[editor_code]
+                logger.debug(f"editor for {folderPath} is {editor_info['name'] if editor_info else editor_code}")
                 response["items"].append(
                     ResponseItem(
                         title=folder,
