@@ -561,6 +561,27 @@ open "$project"</string>
 			<key>config</key>
 			<dict>
 				<key>default</key>
+				<string></string>
+				<key>placeholder</key>
+				<string>Use Python editors</string>
+				<key>required</key>
+				<false/>
+				<key>trim</key>
+				<true/>
+			</dict>
+			<key>description</key>
+			<string></string>
+			<key>label</key>
+			<string>Editors for Jupyter notebooks</string>
+			<key>type</key>
+			<string>textfield</string>
+			<key>variable</key>
+			<string>EDITORS_JUPYTER</string>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>default</key>
 				<string>webstorm,phpstorm,idea,code</string>
 				<key>placeholder</key>
 				<string></string>
