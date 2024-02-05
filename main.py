@@ -103,7 +103,7 @@ class Editors:
             return self.get_first_available_editor(self.get_editors_from_environment('EDITORS_PHP', ['phpstorm', 'idea', 'code']))
 
         # it has requirements file, so it's python
-        if os.path.isfile(f"{path}/requirements.txt") or len(glob.glob(f"{path}/*.py")) > 0:
+        if os.path.isfile(f"{path}/requirements.txt") or os.path.isdir(f"{path}/.venv") or len(glob.glob(f"{path}/*.py")) > 0:
             return self.get_first_available_editor(self.get_editors_from_environment('EDITORS_PYTHON', ['pycharm', 'idea', 'code']))
 
         # it has package.json file, so it's node/javascript
