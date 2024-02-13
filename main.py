@@ -62,6 +62,7 @@ class UsageData:
 class Editors:
     editors = {
         "code": {"name": "VS Code", "available": bool(which("code")), "icon": {"path": "images/vscode.svg"}},
+        "obsidian": {"name": "Obsidian", "available": bool(which("obsidian")), "icon": {"path": "images/obsidian.png"}},
         "idea": {"name": "IntelliJ IDEA", "available": bool(which("idea")), "icon": {"path": "images/idea.svg"}},
         "phpstorm": {"name": "PHPStorm", "available": bool(which("phpstorm")), "icon": {"path": "images/phpstorm.svg"}},
         "webstorm": {"name": "WebStorm", "available": bool(which("webstorm")), "icon": {"path": "images/webstorm.svg"}},
@@ -97,6 +98,11 @@ class Editors:
 
     def determine_editor(self, path):
         logger.debug(f"determining editor for {path}")
+
+        # it has obsidian directory, so it's obsidian
+        if os.path.isdir(os.path.join(path, '.obsidian')):
+            return self.get_first_available_editor(['obsidian'])
+
         # this project has existing vscode configuration
         # and no idea configuration, so we assume vscode is the default
         if not os.path.isdir(os.path.join(path, '.idea')) and os.path.isdir(os.path.join(path, '.vscode')):
