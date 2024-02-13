@@ -163,7 +163,14 @@ def list(paths):
 
     projectPaths = paths.split(",");
     for projectPath in projectPaths:
-        abspath = os.path.abspath(os.path.expanduser(projectPath))
+        try:
+            abspath = os.path.abspath(os.path.expanduser(projectPath))
+        except:
+            logger.error(f"error expanding {projectPath}")
+            continue
+        if not os.path.isdir(abspath):
+            logger.error(f"{abspath} is not a directory")
+            continue
         for folder in os.listdir(abspath):
             folderPath = os.path.join(abspath, folder);
             if os.path.isdir(folderPath):
