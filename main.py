@@ -171,10 +171,10 @@ def list(paths):
         if not os.path.isdir(abspath):
             logger.error(f"{abspath} is not a directory")
             continue
+        editors = Editors()
         for folder in os.listdir(abspath):
             folderPath = os.path.join(abspath, folder);
             if os.path.isdir(folderPath):
-                editors = Editors()
                 editor_code = editors.determine_editor(folderPath)
                 editor_info = editors.editors[editor_code]
                 logger.debug(f"editor for {folderPath} is {editor_info['name'] if editor_info else editor_code}")
