@@ -2,7 +2,7 @@
 
 Alfred workflow to quickly open a project in an editor, terminal, or Finder.
 
-It is Alfred version of Oh-My-ZSH [PJ plugin](https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/pj)
+It is Alfred version of Oh-My-ZSH's [PJ plugin](https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/pj)
 
 ## Features
 
