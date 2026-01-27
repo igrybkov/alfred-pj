@@ -5,6 +5,7 @@ import glob
 import json
 import logging
 import os
+import subprocess
 import sys
 import tempfile
 from shutil import which
@@ -215,6 +216,100 @@ def clear_usage():
     usage = UsageData()
     usage.clear()
     usage.write_data()
+
+
+@cli.command()
+@click.option('--path', required=True, type=click.Path(exists=True), help='Project path.')
+def open_project(path):
+    """Open project in the detected editor."""
+    editor_cmd = Editors().determine_editor(path)
+    subprocess.run([editor_cmd, path])
+
+
+@cli.command()
+@click.option('--path', required=True, type=click.Path(exists=True), help='Project path.')
+def open_vscode(path):
+    """Open project in VS Code."""
+    subprocess.run(['code', path])
+
+
+class Terminals:
+    """Terminal detection and launching."""
+
+    # Order determines priority
+    TERMINALS = [
+        {
+            "name": "Ghostty",
+            "check": lambda: os.path.isdir("/Applications/Ghostty.app") or bool(which("ghostty")),
+            "open": lambda path: subprocess.run(
+                ['ghostty', f'--working-directory={path}'],
+                env={**os.environ, 'PATH': f"/Applications/Ghostty.app/Contents/MacOS:{os.environ.get('PATH', '')}"}
+            ),
+        },
+        {
+            "name": "WezTerm",
+            "check": lambda: os.path.isdir("/Applications/WezTerm.app") or bool(which("wezterm")),
+            "open": lambda path: subprocess.run(['wezterm', 'cli', 'spawn', '--cwd', path]),
+        },
+        {
+            "name": "iTerm",
+            "check": lambda: os.path.isdir("/Applications/iTerm.app"),
+            "open": lambda path: subprocess.run(['osascript', '-e', f'''
+                tell application "iTerm"
+                    tell current window
+                        create tab with default profile
+                        tell current session
+                            write text "cd {path!r}"
+                        end tell
+                    end tell
+                end tell
+            ''']),
+        },
+        {
+            "name": "Terminal",
+            "check": lambda: True,  # Always available on macOS
+            "open": lambda path: subprocess.run(['osascript', '-e', f'''
+                tell application "Terminal"
+                    activate
+                    do script "cd {path!r}"
+                end tell
+            ''']),
+        },
+    ]
+
+    @classmethod
+    def get_available_terminal(cls):
+        """Return the first available terminal."""
+        for terminal in cls.TERMINALS:
+            if terminal["check"]():
+                return terminal
+        return cls.TERMINALS[-1]  # Fallback to Terminal.app
+
+
+@cli.command()
+@click.option('--path', required=True, type=click.Path(exists=True), help='Project path.')
+def open_terminal(path):
+    """Open terminal and cd to project directory.
+
+    Supports: Ghostty, WezTerm, iTerm, Terminal (in priority order).
+    """
+    terminal = Terminals.get_available_terminal()
+    logger.debug(f"Using terminal: {terminal['name']}")
+    terminal["open"](path)
+
+
+@cli.command()
+@click.option('--path', required=True, type=click.Path(exists=True), help='Project path.')
+def open_github(path):
+    """Open GitHub page for the project."""
+    subprocess.run(['gh', 'browse'], cwd=path)
+
+
+@cli.command()
+@click.option('--path', required=True, type=click.Path(exists=True), help='Project path.')
+def open_finder(path):
+    """Open project in Finder."""
+    subprocess.run(['open', path])
 
 
 if __name__ == '__main__':
