@@ -176,3 +176,70 @@ class TestListCommand:
         assert items[-1]["title"] == "> Clear usage data"
         assert items[-1]["arg"] == "__CLEAR_USAGE__"
         assert items[-1]["subtitle"] == "Reset project selection statistics"
+
+    def test_skips_hidden_directories(self, tmp_path, temp_usage_dir):
+        """Should skip directories starting with a dot."""
+        projects = tmp_path / "projects"
+        projects.mkdir()
+
+        # Create a visible project
+        visible_proj = projects / "visible-project"
+        visible_proj.mkdir()
+        (visible_proj / "package.json").touch()
+
+        # Create hidden directories (should be skipped)
+        hidden_proj = projects / ".hidden-project"
+        hidden_proj.mkdir()
+        (hidden_proj / "package.json").touch()
+
+        git_dir = projects / ".git"
+        git_dir.mkdir()
+
+        runner = CliRunner()
+        result = runner.invoke(list_cmd, ["--paths", str(projects)])
+
+        output = json.loads(result.output)
+        titles = [item["title"] for item in output["items"]]
+
+        assert "visible-project" in titles
+        assert ".hidden-project" not in titles
+        assert ".git" not in titles
+
+    def test_handles_tilde_path_expansion(self, tmp_path, temp_usage_dir, monkeypatch):
+        """Should expand ~ in paths."""
+        # Create projects in a fake home directory
+        fake_home = tmp_path / "fakehome"
+        fake_home.mkdir()
+        projects = fake_home / "projects"
+        projects.mkdir()
+
+        proj = projects / "home-project"
+        proj.mkdir()
+        (proj / "pyproject.toml").touch()
+
+        monkeypatch.setenv("HOME", str(fake_home))
+
+        runner = CliRunner()
+        result = runner.invoke(list_cmd, ["--paths", "~/projects"])
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+        titles = [item["title"] for item in output["items"]]
+        assert "home-project" in titles
+
+    def test_handles_path_with_special_chars(self, tmp_path, temp_usage_dir):
+        """Should handle paths with spaces and special characters."""
+        projects = tmp_path / "my projects"
+        projects.mkdir()
+
+        proj = projects / "project-name"
+        proj.mkdir()
+        (proj / "package.json").touch()
+
+        runner = CliRunner()
+        result = runner.invoke(list_cmd, ["--paths", str(projects)])
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+        titles = [item["title"] for item in output["items"]]
+        assert "project-name" in titles

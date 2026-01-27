@@ -1,9 +1,8 @@
 """Tests for editor detection."""
 
-import pytest
 from unittest.mock import patch
 
-from alfred_pj.editors import Editors, DETECTORS
+from alfred_pj.editors import DETECTORS, Editors
 
 
 class TestEditorDetection:
@@ -167,8 +166,7 @@ class TestGetEditorsFromEnvironment:
         mock_env(EDITORS_JUPYTER=None, EDITORS_PYTHON="pycharm")
         editors = Editors()
         result = editors.get_editors_from_environment(
-            ["EDITORS_JUPYTER", "EDITORS_PYTHON"],
-            ["code"]
+            ["EDITORS_JUPYTER", "EDITORS_PYTHON"], ["code"]
         )
         assert result == ["pycharm"]
 
@@ -243,3 +241,91 @@ class TestMatchesDetector:
         editors = Editors()
         detector = {"dirs": [".vscode"], "exclude_dirs": [".idea"]}
         assert not editors._matches_detector(str(temp_project), detector)
+
+
+class TestGetEditor:
+    """Tests for Editors.get_editor() method."""
+
+    def test_returns_known_editor(self):
+        """Should return info for known editor."""
+        editors = Editors()
+        result = editors.get_editor("code")
+        assert result is not None
+        assert "name" in result
+        assert result["name"] == "VS Code"
+
+    def test_registers_dynamic_editor_when_available(self, monkeypatch):
+        """Should register and return dynamic editor if available."""
+        editors = Editors()
+        # Mock which() to return a path for our fake editor
+        with patch("alfred_pj.editors.which") as mock_which:
+            mock_which.return_value = "/usr/local/bin/custom-editor"
+            result = editors.get_editor("custom-editor")
+            assert result is not None
+            assert result["available"] is True
+            assert result["name"] == "Custom Editor"  # Title case
+
+    def test_registers_unavailable_editor(self, monkeypatch):
+        """Should register editor as unavailable if not found."""
+        editors = Editors()
+        with patch("alfred_pj.editors.which") as mock_which:
+            mock_which.return_value = None
+            result = editors.get_editor("nonexistent-editor")
+            assert result is not None
+            assert result["available"] is False
+
+
+class TestDynamicEditorRegistration:
+    """Tests for dynamic editor registration."""
+
+    def test_dynamic_editor_uses_title_case_name(self):
+        """Dynamic editor should have title-cased display name."""
+        editors = Editors()
+        with patch("alfred_pj.editors.which") as mock_which:
+            mock_which.return_value = "/usr/bin/my-custom-editor"
+            editors._register_dynamic_editor("my-custom-editor")
+            assert editors.editors["my-custom-editor"]["name"] == "My Custom Editor"
+
+    def test_dynamic_editor_with_underscore(self):
+        """Dynamic editor with underscores should convert to spaces."""
+        editors = Editors()
+        with patch("alfred_pj.editors.which") as mock_which:
+            mock_which.return_value = "/usr/bin/my_editor"
+            editors._register_dynamic_editor("my_editor")
+            assert editors.editors["my_editor"]["name"] == "My Editor"
+
+    def test_dynamic_editor_uses_fallback_icon(self):
+        """Dynamic editor should use workflow icon as fallback."""
+        editors = Editors()
+        with patch("alfred_pj.editors.which") as mock_which:
+            mock_which.return_value = "/usr/bin/some-editor"
+            editors._register_dynamic_editor("some-editor")
+            assert editors.editors["some-editor"]["icon"] == {"path": "icon.png"}
+
+    def test_get_first_available_registers_unknown_editor(self):
+        """get_first_available_editor should register unknown editors."""
+        editors = Editors()
+        with patch("alfred_pj.editors.which") as mock_which:
+            mock_which.return_value = "/usr/bin/my-new-editor"
+            result = editors.get_first_available_editor(["my-new-editor"])
+            assert result == "my-new-editor"
+            assert "my-new-editor" in editors.editors
+            assert editors.editors["my-new-editor"]["available"] is True
+
+    def test_get_first_available_skips_unavailable_dynamic(self):
+        """get_first_available_editor should skip unavailable dynamic editors."""
+        editors = Editors()
+        with patch("alfred_pj.editors.which") as mock_which:
+            # First editor not available, second is
+            def which_side_effect(cmd):
+                if cmd == "unavailable-editor":
+                    return None
+                elif cmd == "code":
+                    return "/usr/bin/code"
+                return None
+
+            mock_which.side_effect = which_side_effect
+
+            result = editors.get_first_available_editor(["unavailable-editor", "code"])
+            # Should return code since it's available (or default if code isn't installed)
+            assert result in ("code", editors.default_editor)
