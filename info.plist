@@ -499,7 +499,7 @@
 			<key>config</key>
 			<dict>
 				<key>default</key>
-				<string>idea,vscode</string>
+				<string>idea</string>
 				<key>placeholder</key>
 				<string></string>
 				<key>required</key>
@@ -541,7 +541,7 @@
 			<key>config</key>
 			<dict>
 				<key>default</key>
-				<string></string>
+				<string>pycharm,idea,code</string>
 				<key>placeholder</key>
 				<string>Use Python editors</string>
 				<key>required</key>
@@ -620,6 +620,69 @@
 			<string>textfield</string>
 			<key>variable</key>
 			<string>EDITORS_RUST</string>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>default</key>
+				<string>webstorm,code</string>
+				<key>placeholder</key>
+				<string></string>
+				<key>required</key>
+				<false/>
+				<key>trim</key>
+				<true/>
+			</dict>
+			<key>description</key>
+			<string></string>
+			<key>label</key>
+			<string>Editors for TypeScript</string>
+			<key>type</key>
+			<string>textfield</string>
+			<key>variable</key>
+			<string>EDITORS_TYPESCRIPT</string>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>default</key>
+				<string>rubymine,code</string>
+				<key>placeholder</key>
+				<string></string>
+				<key>required</key>
+				<false/>
+				<key>trim</key>
+				<true/>
+			</dict>
+			<key>description</key>
+			<string></string>
+			<key>label</key>
+			<string>Editors for Ruby</string>
+			<key>type</key>
+			<string>textfield</string>
+			<key>variable</key>
+			<string>EDITORS_RUBY</string>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>default</key>
+				<string>clion,code</string>
+				<key>placeholder</key>
+				<string></string>
+				<key>required</key>
+				<false/>
+				<key>trim</key>
+				<true/>
+			</dict>
+			<key>description</key>
+			<string></string>
+			<key>label</key>
+			<string>Editors for C/C++</string>
+			<key>type</key>
+			<string>textfield</string>
+			<key>variable</key>
+			<string>EDITORS_CPP</string>
 		</dict>
 	</array>
 	<key>version</key>
