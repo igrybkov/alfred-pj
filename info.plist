@@ -340,73 +340,73 @@
 			<key>note</key>
 			<string>Open in Terminal</string>
 			<key>xpos</key>
-			<real>400</real>
+			<real>400.0</real>
 			<key>ypos</key>
-			<real>335</real>
+			<real>335.0</real>
 		</dict>
 		<key>0B6D3AAC-85C3-49C5-8EA9-71AD7F1A5DC5</key>
 		<dict>
 			<key>note</key>
 			<string>Open Project in an editor</string>
 			<key>xpos</key>
-			<real>400</real>
+			<real>400.0</real>
 			<key>ypos</key>
-			<real>35</real>
+			<real>35.0</real>
 		</dict>
 		<key>24C2FAE6-1209-4818-A232-9335DD73B2B0</key>
 		<dict>
 			<key>note</key>
 			<string>Open in VSCode</string>
 			<key>xpos</key>
-			<real>400</real>
+			<real>400.0</real>
 			<key>ypos</key>
-			<real>190</real>
+			<real>190.0</real>
 		</dict>
 		<key>52D85C52-F24C-4EBA-8FF1-9819EB93F824</key>
 		<dict>
 			<key>note</key>
 			<string>Open in Finder</string>
 			<key>xpos</key>
-			<real>400</real>
+			<real>400.0</real>
 			<key>ypos</key>
-			<real>615</real>
+			<real>615.0</real>
 		</dict>
 		<key>8E0EEBD6-D9A3-4C78-AB4D-623FED25FFAD</key>
 		<dict>
 			<key>note</key>
 			<string>Open in GitHub</string>
 			<key>xpos</key>
-			<real>400</real>
+			<real>400.0</real>
 			<key>ypos</key>
-			<real>475</real>
+			<real>475.0</real>
 		</dict>
 		<key>BE486813-1BCF-42FA-8149-1D21E12D3F61</key>
 		<dict>
 			<key>xpos</key>
-			<real>85</real>
+			<real>85.0</real>
 			<key>ypos</key>
-			<real>335</real>
+			<real>335.0</real>
 		</dict>
 		<key>DC77954C-454C-445C-9213-F796827F1A9A</key>
 		<dict>
 			<key>xpos</key>
-			<real>185</real>
+			<real>185.0</real>
 			<key>ypos</key>
-			<real>640</real>
+			<real>640.0</real>
 		</dict>
 		<key>E9785708-034F-40AC-9604-D4A944742625</key>
 		<dict>
 			<key>xpos</key>
-			<real>365</real>
+			<real>365.0</real>
 			<key>ypos</key>
-			<real>830</real>
+			<real>830.0</real>
 		</dict>
 		<key>E9F5373F-CA55-46DA-BC83-099C502EFA69</key>
 		<dict>
 			<key>xpos</key>
-			<real>50</real>
+			<real>50.0</real>
 			<key>ypos</key>
-			<real>835</real>
+			<real>835.0</real>
 		</dict>
 	</dict>
 	<key>userconfigurationconfig</key>

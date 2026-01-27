@@ -3,6 +3,7 @@
 
 import json
 import plistlib
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -12,6 +13,7 @@ import click
 
 ROOT = Path(__file__).parent.parent
 PLIST_PATH = ROOT / "info.plist"
+PYPROJECT_PATH = ROOT / "pyproject.toml"
 WORKFLOW_NAME = "alfred-pj.alfredworkflow"
 
 # Files to include in the workflow package
@@ -46,10 +48,16 @@ def get_version() -> str:
 
 
 def set_version(version: str) -> None:
-    """Set version in info.plist."""
+    """Set version in info.plist and pyproject.toml."""
+    # Update info.plist
     plist = get_plist()
     plist["version"] = version
     write_plist(plist)
+
+    # Update pyproject.toml
+    content = PYPROJECT_PATH.read_text()
+    content = re.sub(r'^version = ".*"', f'version = "{version}"', content, flags=re.MULTILINE)
+    PYPROJECT_PATH.write_text(content)
 
 
 def bump_version(bump_type: str) -> str:
@@ -247,7 +255,7 @@ def release(bump_type: str, draft: bool, dry_run: bool):
     set_version(new_version)
 
     # Git operations
-    subprocess.run(["git", "add", "info.plist"], cwd=ROOT, check=True)
+    subprocess.run(["git", "add", "info.plist", "pyproject.toml"], cwd=ROOT, check=True)
     subprocess.run(
         ["git", "commit", "-m", f"Bump version to {new_version}"],
         cwd=ROOT,

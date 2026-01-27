@@ -49,7 +49,7 @@ jobs:
 
       - name: Commit and tag
         run: |
-          git add info.plist
+          git add info.plist pyproject.toml
           git commit -m "Bump version to ${{ steps.new.outputs.version }}"
           git tag -a "v${{ steps.new.outputs.version }}" -m "v${{ steps.new.outputs.version }}"
           git push --follow-tags
