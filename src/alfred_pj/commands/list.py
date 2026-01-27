@@ -30,6 +30,8 @@ def list(paths):
             continue
         editors = Editors()
         for folder in os.listdir(abspath):
+            if folder.startswith("."):
+                continue
             folderPath = os.path.join(abspath, folder)
             if os.path.isdir(folderPath):
                 editor_code = editors.determine_editor(folderPath)
