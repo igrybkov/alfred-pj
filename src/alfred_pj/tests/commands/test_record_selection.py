@@ -1,6 +1,5 @@
 """Tests for record-selection command."""
 
-import pytest
 from click.testing import CliRunner
 
 from alfred_pj.commands.record_selection import record_selection
@@ -57,10 +56,7 @@ class TestRecordSelectionCommand:
     def test_accepts_nonexistent_path(self, temp_usage_dir):
         """Should accept paths that don't exist (for recording future projects)."""
         runner = CliRunner()
-        result = runner.invoke(
-            record_selection,
-            ["--path", "/nonexistent/project/path"]
-        )
+        result = runner.invoke(record_selection, ["--path", "/nonexistent/project/path"])
 
         # Should succeed - we're just recording a string
         assert result.exit_code == 0
@@ -80,3 +76,14 @@ class TestRecordSelectionCommand:
         usage = UsageData()
         assert usage.get_usage_by_path("/path/a") == 3
         assert usage.get_usage_by_path("/path/b") == 1
+
+    def test_skips_clear_usage_path(self, temp_usage_dir):
+        """Should not record usage for __CLEAR_USAGE__ special path."""
+        runner = CliRunner()
+        result = runner.invoke(record_selection, ["--path", "__CLEAR_USAGE__"])
+
+        assert result.exit_code == 0
+
+        # Verify nothing was recorded
+        usage = UsageData()
+        assert usage.get_usage_by_path("__CLEAR_USAGE__") == 0

@@ -49,4 +49,13 @@ def list(paths):
                     )
                 )
     response["items"] = sorted(response["items"], key=lambda item: item.calls, reverse=True)
+    # Add "Clear usage data" item at the end
+    response["items"].append(
+        ResponseItem(
+            title="> Clear usage data",
+            subtitle="Reset project selection statistics",
+            arg="__CLEAR_USAGE__",
+            icon={"path": "icon.png"},
+        )
+    )
     print(json.dumps(response, default=lambda o: o.__dict__))

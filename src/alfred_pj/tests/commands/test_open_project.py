@@ -1,7 +1,7 @@
 """Tests for open-project command."""
 
-import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
+
 from click.testing import CliRunner
 
 from alfred_pj.commands.open_project import open_project
@@ -26,16 +26,17 @@ class TestOpenProjectCommand:
 
     def test_uses_correct_editor_for_project_type(self, go_project):
         """Should use correct editor based on project type."""
-        with patch("subprocess.run") as mock_run:
-            # Mock which to make goland "available"
-            with patch("alfred_pj.editors.which", side_effect=lambda x: x if x == "goland" else None):
-                runner = CliRunner()
-                result = runner.invoke(open_project, ["--path", str(go_project)])
+        with (
+            patch("subprocess.run") as mock_run,
+            patch("alfred_pj.editors.which", side_effect=lambda x: x if x == "goland" else None),
+        ):
+            runner = CliRunner()
+            result = runner.invoke(open_project, ["--path", str(go_project)])
 
-                if result.exit_code == 0 and mock_run.called:
-                    args = mock_run.call_args[0][0]
-                    # Should be a Go editor
-                    assert args[0] in ["goland", "idea", "code"]
+            if result.exit_code == 0 and mock_run.called:
+                args = mock_run.call_args[0][0]
+                # Should be a Go editor
+                assert args[0] in ["goland", "idea", "code"]
 
     def test_requires_existing_path(self, tmp_path):
         """Should require path to exist."""
@@ -51,3 +52,26 @@ class TestOpenProjectCommand:
 
         assert result.exit_code != 0
         assert "Missing option '--path'" in result.output
+
+    def test_clear_usage_clears_data(self, temp_usage_dir):
+        """Should clear usage data when path is __CLEAR_USAGE__."""
+        from alfred_pj.usage import UsageData
+
+        # Add some usage data first
+        usage = UsageData()
+        usage.add_usage("/some/path", count=5)
+        usage.write_data()
+
+        # Verify data exists
+        usage = UsageData()
+        assert usage.get_usage_by_path("/some/path") == 5
+
+        # Run with special clear arg
+        runner = CliRunner()
+        result = runner.invoke(open_project, ["--path", "__CLEAR_USAGE__"])
+
+        assert result.exit_code == 0
+
+        # Verify data was cleared
+        usage = UsageData()
+        assert usage.get_usage_by_path("/some/path") == 0
