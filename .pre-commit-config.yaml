@@ -5,3 +5,12 @@ repos:
       - id: ruff-check
         args: [--fix]
       - id: ruff-format
+
+  - repo: local
+    hooks:
+      - id: sync-defaults
+        name: Sync editor defaults to info.plist
+        entry: uv run bin/release.py sync-defaults
+        language: system
+        always_run: true
+        pass_filenames: false
