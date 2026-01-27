@@ -8,9 +8,33 @@ import os
 import subprocess
 import sys
 import tempfile
-from shutil import which
+from pathlib import Path
+from shutil import which as system_which
 
 import click
+
+# Fallback paths to search if command not found in system PATH
+FALLBACK_SEARCH_PATHS = [
+    "/opt/homebrew/bin",
+    "/opt/homebrew/sbin",
+    "/usr/local/bin",
+    Path.home() / ".local/bin",
+]
+
+
+def which(cmd: str) -> str | None:
+    """Find command in PATH, falling back to common install locations."""
+    # Try system PATH first
+    if result := system_which(cmd):
+        return result
+
+    # Fall back to common paths (useful when Alfred has limited PATH)
+    for directory in FALLBACK_SEARCH_PATHS:
+        cmd_path = Path(directory) / cmd
+        if cmd_path.is_file() and os.access(cmd_path, os.X_OK):
+            return str(cmd_path)
+
+    return None
 
 logging.basicConfig(level=logging.DEBUG, format='[%(levelname)] %(message)s')
 
