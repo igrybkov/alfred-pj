@@ -12,6 +12,7 @@ from zipfile import ZipFile
 import click
 
 ROOT = Path(__file__).parent.parent
+SRC_PATH = ROOT / "src"
 PLIST_PATH = ROOT / "info.plist"
 PYPROJECT_PATH = ROOT / "pyproject.toml"
 WORKFLOW_NAME = "alfred-pj.alfredworkflow"
@@ -29,6 +30,21 @@ PACKAGE_FILES = [
 ]
 PACKAGE_GLOBS = ["icon.*"]
 
+# Directories and extensions to exclude from the package
+EXCLUDE_DIRS = {"tests", "__pycache__", ".pytest_cache"}
+EXCLUDE_EXTENSIONS = {".pyc"}
+
+
+def _should_exclude(path: Path) -> bool:
+    """Check if path should be excluded from package."""
+    # Check if any parent directory is in exclude list
+    if any(part in EXCLUDE_DIRS for part in path.parts):
+        return True
+    # Check file extension
+    if path.suffix in EXCLUDE_EXTENSIONS:
+        return True
+    return False
+
 
 def get_plist() -> dict:
     """Read info.plist."""
@@ -40,6 +56,65 @@ def write_plist(data: dict) -> None:
     """Write info.plist."""
     with open(PLIST_PATH, "wb") as f:
         plistlib.dump(data, f)
+
+
+def get_detectors() -> list[dict]:
+    """Import and return DETECTORS from cli module."""
+    # Add src to path temporarily to import the module
+    sys.path.insert(0, str(SRC_PATH))
+    try:
+        from alfred_pj.editors import DETECTORS
+
+        return DETECTORS
+    finally:
+        sys.path.pop(0)
+
+
+def sync_editor_defaults(write: bool = True) -> dict[str, str]:
+    """Sync editor defaults from DETECTORS to info.plist.
+
+    Args:
+        write: If True, write changes to plist. If False, only report changes.
+
+    Returns dict of variable -> new_value for any changes needed/made.
+    """
+    detectors = get_detectors()
+    plist = get_plist()
+
+    # Build mapping: env_var -> default_editors from DETECTORS
+    detector_defaults = {}
+    for detector in detectors:
+        env = detector.get("env")
+        editors = detector.get("editors", [])
+        if not env or not editors:
+            continue
+
+        # env can be a string or list of strings
+        env_vars = [env] if isinstance(env, str) else env
+        default_value = ",".join(editors)
+
+        for env_var in env_vars:
+            # Only set if not already defined (first detector wins)
+            if env_var not in detector_defaults:
+                detector_defaults[env_var] = default_value
+
+    # Update plist user configuration
+    changes = {}
+    config_list = plist.get("userconfigurationconfig", [])
+
+    for config_item in config_list:
+        variable = config_item.get("variable", "")
+        if variable in detector_defaults:
+            current = config_item.get("config", {}).get("default", "")
+            new_value = detector_defaults[variable]
+            if current != new_value:
+                config_item["config"]["default"] = new_value
+                changes[variable] = new_value
+
+    if changes and write:
+        write_plist(plist)
+
+    return changes
 
 
 def get_version() -> str:
@@ -88,9 +163,7 @@ def get_alfred_workflows_path() -> Path:
     """Get Alfred workflows directory path."""
     prefs_path = Path.home() / "Library/Application Support/Alfred/prefs.json"
     if not prefs_path.exists():
-        raise click.ClickException(
-            "Could not find Alfred config. Make sure Alfred is installed."
-        )
+        raise click.ClickException("Could not find Alfred config. Make sure Alfred is installed.")
 
     with open(prefs_path) as f:
         prefs = json.load(f)
@@ -127,11 +200,8 @@ def version(version: str | None, bump: str | None):
 
     current = get_version()
 
-    if bump:
-        new_version = bump_version(bump)
-    else:
-        # Strip leading 'v' if present
-        new_version = version.lstrip("vV")
+    # Strip leading 'v' if present when version is provided explicitly
+    new_version = bump_version(bump) if bump else version.lstrip("vV")
 
     set_version(new_version)
     click.echo(f"{current} → {new_version}")
@@ -152,7 +222,7 @@ def package(output: str | None):
             path = ROOT / item
             if path.is_dir():
                 for file in path.rglob("*"):
-                    if file.is_file():
+                    if file.is_file() and not _should_exclude(file):
                         zf.write(file, file.relative_to(ROOT))
             elif path.exists():
                 zf.write(path, path.relative_to(ROOT))
@@ -198,6 +268,33 @@ def unlink():
     click.echo(f"Unlinked {link_path}")
 
 
+@cli.command("sync-defaults")
+@click.option(
+    "--check",
+    is_flag=True,
+    help="Check if sync is needed without making changes. Exits 1 if out of sync.",
+)
+def sync_defaults(check: bool):
+    """Sync editor defaults from code to info.plist.
+
+    Reads DETECTORS from cli.py and updates the default editor
+    preferences in info.plist to match.
+    """
+    changes = sync_editor_defaults(write=not check)
+    if changes:
+        if check:
+            click.echo("Defaults out of sync in info.plist:")
+            for var, value in sorted(changes.items()):
+                click.echo(f"  {var}: should be {value}")
+            raise SystemExit(1)
+        else:
+            click.echo("Updated defaults in info.plist:")
+            for var, value in sorted(changes.items()):
+                click.echo(f"  {var}: {value}")
+    else:
+        click.echo("All defaults already in sync")
+
+
 @cli.command()
 def update():
     """Package and open workflow for manual update."""
@@ -224,9 +321,7 @@ def release(bump_type: str, draft: bool, dry_run: bool):
         cwd=ROOT,
     )
     if result.stdout.strip():
-        raise click.ClickException(
-            "Working tree is not clean. Commit or stash changes first."
-        )
+        raise click.ClickException("Working tree is not clean. Commit or stash changes first.")
 
     # Check branch
     result = subprocess.run(
@@ -250,6 +345,16 @@ def release(bump_type: str, draft: bool, dry_run: bool):
     if dry_run:
         click.echo("Dry run - stopping here")
         return
+
+    # Sync editor defaults from code to plist
+    click.echo("Syncing editor defaults...")
+    default_changes = sync_editor_defaults()
+    if default_changes:
+        click.echo("Updated defaults:")
+        for var, value in sorted(default_changes.items()):
+            click.echo(f"  {var}: {value}")
+    else:
+        click.echo("Defaults already in sync")
 
     # Update version
     set_version(new_version)
