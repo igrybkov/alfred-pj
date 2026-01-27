@@ -6,8 +6,7 @@ Inspired by Oh-My-ZSH's [pj plugin](https://github.com/ohmyzsh/ohmyzsh/tree/mast
 
 ## Screenshot
 
-<!-- TODO: Add screenshot or GIF showing the workflow in action -->
-<!-- Example: ![PJ Workflow Demo](images/demo.gif) -->
+![PJ Screenshot](.github/screenshot.png)
 
 ## Features
 
