@@ -10,35 +10,40 @@ Alfred workflow for quickly opening projects in their appropriate editor, termin
 
 ```bash
 # Link workflow to Alfred for development (creates symlink)
-./bin/link
+uv run bin/release.py link
 
 # Unlink workflow from Alfred
-./bin/unlink
+uv run bin/release.py unlink
+
+# Get current version
+uv run bin/release.py version
+
+# Set version (explicit or bump)
+uv run bin/release.py version 1.2.3
+uv run bin/release.py version --bump patch
 
 # Package workflow into .alfredworkflow file
-./bin/package
-
-# Set version (accepts: patch, minor, major, or specific version)
-./bin/set-version patch
-./bin/set-version 1.2.3
+uv run bin/release.py package
 
 # Create a new release (must be on main branch with clean working tree)
-./bin/release patch  # Bumps version, creates tag, pushes, creates GitHub release
+uv run bin/release.py release patch        # Full release workflow
+uv run bin/release.py release patch --dry-run  # Preview without executing
 ```
 
 ## Architecture
 
-- **main.py**: Core Python script with CLI commands using Click library
+- **src/alfred_pj/cli.py**: Core Python script with CLI commands using Click library
   - `list --paths <paths>`: Lists projects and returns Alfred JSON response
   - `editor --path <path>`: Determines the appropriate editor for a project
   - `record-selection --path <path>`: Records usage for sorting
   - `clear-usage`: Clears usage statistics
+  - `open-project`, `open-vscode`, `open-terminal`, `open-github`, `open-finder`: Action commands
+
+- **bin/release.py**: Release management CLI (version, package, link, release)
 
 - **info.plist**: Alfred workflow configuration defining:
   - User-configurable variables (keyword, paths, editor preferences)
   - Workflow actions and modifier key bindings
-
-- **lib/**: Bundled Click library (no external dependencies needed)
 
 ## Editor Detection Logic
 

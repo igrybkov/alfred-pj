@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-
-cd "$(git rev-parse --show-toplevel)" || exit 1
-
-set -o pipefail
-
-rm -rf *.alfredworkflow
-zip -r "$(basename "$(pwd)").alfredworkflow" images src app.sh pyproject.toml uv.lock LICENSE README.md *.plist icon.*
