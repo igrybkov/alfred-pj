@@ -74,3 +74,4 @@ jobs:
           echo "- **Version:** ${{ steps.current.outputs.version }} → ${{ steps.new.outputs.version }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Tag:** v${{ steps.new.outputs.version }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Draft:** ${{ inputs.draft }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Release:** ${{ github.server_url }}/${{ github.repository }}/releases/tag/v${{ steps.new.outputs.version }}" >> $GITHUB_STEP_SUMMARY
