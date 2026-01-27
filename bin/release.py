@@ -41,9 +41,7 @@ def _should_exclude(path: Path) -> bool:
     if any(part in EXCLUDE_DIRS for part in path.parts):
         return True
     # Check file extension
-    if path.suffix in EXCLUDE_EXTENSIONS:
-        return True
-    return False
+    return path.suffix in EXCLUDE_EXTENSIONS
 
 
 def get_plist() -> dict:
@@ -359,8 +357,12 @@ def release(bump_type: str, draft: bool, dry_run: bool):
     # Update version
     set_version(new_version)
 
+    # Regenerate lock file
+    click.echo("Regenerating lock file...")
+    subprocess.run(["uv", "lock"], cwd=ROOT, check=True)
+
     # Git operations
-    subprocess.run(["git", "add", "info.plist", "pyproject.toml"], cwd=ROOT, check=True)
+    subprocess.run(["git", "add", "info.plist", "pyproject.toml", "uv.lock"], cwd=ROOT, check=True)
     subprocess.run(
         ["git", "commit", "-m", f"Bump version to {new_version}"],
         cwd=ROOT,
