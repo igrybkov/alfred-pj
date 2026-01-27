@@ -1,3 +1,14 @@
+---
+name: release-changelog
+description: Generate and update release notes for GitHub releases
+allowed-tools:
+  - Bash(git tag:*)
+  - Bash(git log:*)
+  - Bash(gh release:*)
+  - Read
+  - Glob
+---
+
 # Release Changelog Skill
 
 Generate release notes for GitHub releases.
@@ -54,9 +65,18 @@ Generate release notes for GitHub releases.
 **Full Changelog**: https://github.com/igrybkov/alfred-pj/compare/v1.0.1...v1.1.0
 ```
 
-## Generating Release Notes
+## Workflow
 
-1. Get the comparison URL: `https://github.com/{owner}/{repo}/compare/{old}...{new}`
-2. Review commits and group changes by type
-3. Write user-focused descriptions (what changed, not how)
-4. Add the Full Changelog link at the end
+1. **Identify scope**
+   - List recent tags with `git tag --sort=-creatordate | head -5`
+   - Check existing release with `gh release view <tag>`
+   - Get commits between tags with `git log <old_tag>..<new_tag> --oneline --no-merges`
+
+2. **Generate changelog**
+   - Group commits by type (features, fixes, changes, DX)
+   - Write user-focused descriptions (what changed, not how)
+   - Include Full Changelog link at the end
+
+3. **Publish to GitHub**
+   - Ask the user if they want to update the GitHub release
+   - If yes, use `gh release edit <tag> --notes "..."` to update
