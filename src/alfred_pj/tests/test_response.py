@@ -1,7 +1,5 @@
 """Tests for Alfred response formatting."""
 
-import pytest
-
 from alfred_pj.response import ResponseItem
 
 

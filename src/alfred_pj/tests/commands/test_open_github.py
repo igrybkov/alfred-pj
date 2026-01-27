@@ -1,7 +1,7 @@
 """Tests for open-github command."""
 
-import pytest
 from unittest.mock import patch
+
 from click.testing import CliRunner
 
 from alfred_pj.commands.open_github import open_github
@@ -17,10 +17,7 @@ class TestOpenGithubCommand:
             result = runner.invoke(open_github, ["--path", str(temp_project)])
 
             assert result.exit_code == 0
-            mock_run.assert_called_once_with(
-                ["gh", "browse"],
-                cwd=str(temp_project)
-            )
+            mock_run.assert_called_once_with(["gh", "browse"], cwd=str(temp_project))
 
     def test_uses_cwd_parameter(self, temp_project):
         """Should use cwd parameter with the project path."""

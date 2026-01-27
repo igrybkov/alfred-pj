@@ -1,7 +1,6 @@
 """Shared test fixtures for alfred-pj tests."""
 
 import pytest
-from pathlib import Path
 
 
 @pytest.fixture
@@ -113,12 +112,14 @@ def cpp_project(temp_project):
 @pytest.fixture
 def mock_env(monkeypatch):
     """Helper to mock environment variables."""
+
     def _mock(**kwargs):
         for key, value in kwargs.items():
             if value is None:
                 monkeypatch.delenv(key, raising=False)
             else:
                 monkeypatch.setenv(key, value)
+
     return _mock
 
 

@@ -1,7 +1,7 @@
 """Tests for open-terminal command."""
 
-import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
+
 from click.testing import CliRunner
 
 from alfred_pj.commands.open_terminal import open_terminal
@@ -18,7 +18,9 @@ class TestOpenTerminalCommand:
             "open": MagicMock(),
         }
 
-        with patch("alfred_pj.terminals.Terminals.get_available_terminal", return_value=mock_terminal):
+        with patch(
+            "alfred_pj.terminals.Terminals.get_available_terminal", return_value=mock_terminal
+        ):
             runner = CliRunner()
             result = runner.invoke(open_terminal, ["--path", str(temp_project)])
 
@@ -35,7 +37,9 @@ class TestOpenTerminalCommand:
             "open": lambda p: call_log.append(("TestTerminal", p)),
         }
 
-        with patch("alfred_pj.terminals.Terminals.get_available_terminal", return_value=mock_terminal):
+        with patch(
+            "alfred_pj.terminals.Terminals.get_available_terminal", return_value=mock_terminal
+        ):
             runner = CliRunner()
             result = runner.invoke(open_terminal, ["--path", str(temp_project)])
 

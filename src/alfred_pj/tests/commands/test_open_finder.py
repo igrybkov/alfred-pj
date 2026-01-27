@@ -1,7 +1,7 @@
 """Tests for open-finder command."""
 
-import pytest
 from unittest.mock import patch
+
 from click.testing import CliRunner
 
 from alfred_pj.commands.open_finder import open_finder

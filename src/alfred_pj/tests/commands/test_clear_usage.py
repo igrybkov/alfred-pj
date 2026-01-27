@@ -1,6 +1,5 @@
 """Tests for clear-usage command."""
 
-import pytest
 from click.testing import CliRunner
 
 from alfred_pj.commands.clear_usage import clear_usage

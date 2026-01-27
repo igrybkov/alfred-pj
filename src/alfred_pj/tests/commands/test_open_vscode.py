@@ -1,7 +1,7 @@
 """Tests for open-vscode command."""
 
-import pytest
 from unittest.mock import patch
+
 from click.testing import CliRunner
 
 from alfred_pj.commands.open_vscode import open_vscode

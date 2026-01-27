@@ -1,6 +1,5 @@
 """Tests for editor command."""
 
-import pytest
 from click.testing import CliRunner
 
 from alfred_pj.commands.editor import editor
@@ -17,8 +16,16 @@ class TestEditorCommand:
         assert result.exit_code == 0
         # Should output an editor code (e.g., 'code', 'pycharm', etc.)
         assert result.output.strip() in [
-            "code", "pycharm", "idea", "obsidian", "phpstorm",
-            "webstorm", "goland", "rustrover", "rubymine", "clion"
+            "code",
+            "pycharm",
+            "idea",
+            "obsidian",
+            "phpstorm",
+            "webstorm",
+            "goland",
+            "rustrover",
+            "rubymine",
+            "clion",
         ]
 
     def test_detects_python_project(self, python_project):

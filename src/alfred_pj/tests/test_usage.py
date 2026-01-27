@@ -1,7 +1,6 @@
 """Tests for usage data tracking."""
 
 import json
-import pytest
 
 from alfred_pj.usage import UsageData
 
@@ -80,7 +79,7 @@ class TestUsageData:
         data_dir = tmp_path / "new_alfred_data"
         monkeypatch.setenv("alfred_workflow_data", str(data_dir))
 
-        usage = UsageData()
+        UsageData()
         assert data_dir.exists()
 
     def test_file_contains_valid_json(self, temp_usage_dir):

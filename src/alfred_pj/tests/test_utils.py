@@ -1,11 +1,9 @@
 """Tests for utility functions."""
 
-import os
-import pytest
 from pathlib import Path
 from unittest.mock import patch
 
-from alfred_pj.utils import which, FALLBACK_SEARCH_PATHS
+from alfred_pj.utils import FALLBACK_SEARCH_PATHS, which
 
 
 class TestWhich:
@@ -32,11 +30,13 @@ class TestWhich:
         fake_cmd.chmod(0o755)
 
         # Patch FALLBACK_SEARCH_PATHS to include our fake path
-        with patch("alfred_pj.utils.FALLBACK_SEARCH_PATHS", [fake_bin]):
-            # Mock system_which to return None (not found in PATH)
-            with patch("alfred_pj.utils.system_which", return_value=None):
-                result = which("fake_cmd")
-                assert result == str(fake_cmd)
+        # Mock system_which to return None (not found in PATH)
+        with (
+            patch("alfred_pj.utils.FALLBACK_SEARCH_PATHS", [fake_bin]),
+            patch("alfred_pj.utils.system_which", return_value=None),
+        ):
+            result = which("fake_cmd")
+            assert result == str(fake_cmd)
 
     def test_checks_executable_permission(self, tmp_path, monkeypatch):
         """Should only return executable files."""
@@ -47,10 +47,12 @@ class TestWhich:
         fake_cmd.touch()
         # Don't set executable permission
 
-        with patch("alfred_pj.utils.FALLBACK_SEARCH_PATHS", [fake_bin]):
-            with patch("alfred_pj.utils.system_which", return_value=None):
-                result = which("non_exec_cmd")
-                assert result is None
+        with (
+            patch("alfred_pj.utils.FALLBACK_SEARCH_PATHS", [fake_bin]),
+            patch("alfred_pj.utils.system_which", return_value=None),
+        ):
+            result = which("non_exec_cmd")
+            assert result is None
 
     def test_prefers_system_path(self):
         """Should prefer system PATH over fallback paths."""

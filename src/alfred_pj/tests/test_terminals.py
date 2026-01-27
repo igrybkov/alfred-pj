@@ -1,7 +1,6 @@
 """Tests for terminal detection."""
 
-import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 from alfred_pj.terminals import Terminals
 
@@ -49,20 +48,28 @@ class TestGetAvailableTerminal:
     def test_returns_first_available(self):
         """Should return first available terminal."""
         # Mock all terminals as unavailable except Terminal
-        with patch.object(Terminals, "TERMINALS", [
-            {"name": "Fake1", "check": lambda: False, "open": lambda p: None},
-            {"name": "Fake2", "check": lambda: False, "open": lambda p: None},
-            {"name": "Terminal", "check": lambda: True, "open": lambda p: None},
-        ]):
+        with patch.object(
+            Terminals,
+            "TERMINALS",
+            [
+                {"name": "Fake1", "check": lambda: False, "open": lambda p: None},
+                {"name": "Fake2", "check": lambda: False, "open": lambda p: None},
+                {"name": "Terminal", "check": lambda: True, "open": lambda p: None},
+            ],
+        ):
             terminal = Terminals.get_available_terminal()
             assert terminal["name"] == "Terminal"
 
     def test_returns_ghostty_when_available(self):
         """Should return Ghostty when it's available."""
-        with patch.object(Terminals, "TERMINALS", [
-            {"name": "Ghostty", "check": lambda: True, "open": lambda p: None},
-            {"name": "Terminal", "check": lambda: True, "open": lambda p: None},
-        ]):
+        with patch.object(
+            Terminals,
+            "TERMINALS",
+            [
+                {"name": "Ghostty", "check": lambda: True, "open": lambda p: None},
+                {"name": "Terminal", "check": lambda: True, "open": lambda p: None},
+            ],
+        ):
             terminal = Terminals.get_available_terminal()
             assert terminal["name"] == "Ghostty"
 
