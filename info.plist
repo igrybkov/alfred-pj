@@ -107,7 +107,7 @@
 				<key>script</key>
 				<string>project=$1
 
-IDE="$(python3 ./main.py editor --path "$project")"
+IDE="$(./app.sh editor --path "$project")"
 
 $IDE "$project"</string>
 				<key>scriptargtype</key>
@@ -210,7 +210,7 @@ end run</string>
 				<key>script</key>
 				<string>query=$1
 
-python3 ./main.py list --paths "$paths"</string>
+./app.sh list --paths "$paths"</string>
 				<key>scriptargtype</key>
 				<integer>1</integer>
 				<key>scriptfile</key>
@@ -291,7 +291,7 @@ open "$project"</string>
 				<key>escaping</key>
 				<integer>102</integer>
 				<key>script</key>
-				<string>python3 ./main.py record-selection --path "$1"</string>
+				<string>./app.sh record-selection --path "$1"</string>
 				<key>scriptargtype</key>
 				<integer>1</integer>
 				<key>scriptfile</key>
@@ -314,7 +314,7 @@ open "$project"</string>
 				<key>escaping</key>
 				<integer>102</integer>
 				<key>script</key>
-				<string>python3 ./main.py clear-usage</string>
+				<string>./app.sh clear-usage</string>
 				<key>scriptargtype</key>
 				<integer>1</integer>
 				<key>scriptfile</key>

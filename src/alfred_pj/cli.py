@@ -6,6 +6,7 @@ import json
 import logging
 import os
 import sys
+import tempfile
 from shutil import which
 
 import click
@@ -34,8 +35,11 @@ response = {
 class UsageData:
     def __init__(self):
         alfred_data_dir = os.getenv('alfred_workflow_data')
+        if not alfred_data_dir:
+            # Fallback for running outside Alfred
+            alfred_data_dir = os.path.join(tempfile.gettempdir(), 'alfred-pj')
         if not os.path.isdir(alfred_data_dir):
-            os.mkdir(alfred_data_dir)
+            os.makedirs(alfred_data_dir, exist_ok=True)
         usage_file = os.path.join(alfred_data_dir, 'usage.json')
         self.file = usage_file
         self.data = self.read_data()
