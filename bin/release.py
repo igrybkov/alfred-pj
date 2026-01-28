@@ -294,8 +294,8 @@ def sync_defaults(check: bool):
 
 
 @cli.command()
-def update():
-    """Package and open workflow for manual update."""
+def install():
+    """Package and open workflow for installation."""
     ctx = click.get_current_context()
     ctx.invoke(package)
     subprocess.run(["open", str(ROOT / WORKFLOW_NAME)], check=True)
