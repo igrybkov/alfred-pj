@@ -14,13 +14,7 @@ class Terminals:
         {
             "name": "Ghostty",
             "check": lambda: os.path.isdir("/Applications/Ghostty.app") or bool(which("ghostty")),
-            "open": lambda path: subprocess.run(
-                ["ghostty", f"--working-directory={path}"],
-                env={
-                    **os.environ,
-                    "PATH": f"/Applications/Ghostty.app/Contents/MacOS:{os.environ.get('PATH', '')}",
-                },
-            ),
+            "open": lambda path: subprocess.run(["open", "-a", "Ghostty", path]),
         },
         {
             "name": "WezTerm",
