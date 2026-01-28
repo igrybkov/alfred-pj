@@ -19,7 +19,10 @@ class Terminals:
         {
             "name": "WezTerm",
             "check": lambda: os.path.isdir("/Applications/WezTerm.app") or bool(which("wezterm")),
-            "open": lambda path: subprocess.run(["wezterm", "cli", "spawn", "--cwd", path]),
+            "open": lambda path: subprocess.run(
+                f"(wezterm start --cwd {path!r} --new-tab &) && sleep 0.5 && open -a WezTerm",
+                shell=True,
+            ),
         },
         {
             "name": "iTerm",
