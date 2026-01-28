@@ -39,10 +39,12 @@ def list(paths):
                 logger.debug(
                     f"editor for {folderPath} is {editor_info['name'] if editor_info else editor_code}"
                 )
+                # Shorten home directory to ~ for display
+                displayPath = folderPath.replace(os.path.expanduser("~"), "~", 1)
                 response["items"].append(
                     ResponseItem(
                         title=folder,
-                        subtitle="Open " + folderPath + " in " + editor_info["name"],
+                        subtitle="Open " + displayPath + " in " + editor_info["name"],
                         arg=folderPath,
                         icon=editor_info["icon"],
                         calls=usage.get_usage_by_path(folderPath),
