@@ -110,23 +110,24 @@ class TestTerminalOpen:
         for terminal in Terminals.TERMINALS:
             assert callable(terminal["open"])
 
-    def test_ghostty_open_uses_working_directory(self):
-        """Ghostty open should use --working-directory flag."""
+    def test_ghostty_open_uses_open_command(self):
+        """Ghostty open should use 'open -a Ghostty <path>' on macOS."""
         ghostty = Terminals.TERMINALS[0]
-        # Inspect the lambda - this is a bit of introspection
-        # The actual call is tested via mocking subprocess
         with patch("subprocess.run") as mock_run:
             ghostty["open"]("/test/path")
-            if mock_run.called:
-                args = mock_run.call_args[0][0]
-                assert "--working-directory=/test/path" in args
+            args = mock_run.call_args[0][0]
+            assert args == ["open", "-a", "Ghostty", "/test/path"]
 
-    def test_wezterm_open_uses_cwd(self):
-        """WezTerm open should use --cwd flag."""
+    def test_wezterm_open_uses_wezterm_start(self):
+        """WezTerm open should use 'wezterm start --cwd --new-tab'."""
         wezterm = Terminals.TERMINALS[1]
         with patch("subprocess.run") as mock_run:
             wezterm["open"]("/test/path")
-            if mock_run.called:
-                args = mock_run.call_args[0][0]
-                assert "--cwd" in args
-                assert "/test/path" in args
+            # WezTerm uses shell=True with a command string
+            call_args = mock_run.call_args
+            cmd = call_args[0][0]
+            assert "wezterm start" in cmd
+            assert "--cwd" in cmd
+            assert "--new-tab" in cmd
+            assert "/test/path" in cmd
+            assert call_args[1]["shell"] is True
