@@ -21,3 +21,18 @@ repos:
         language: system
         always_run: true
         pass_filenames: false
+
+      - id: uv-lock
+        name: uv lock --check
+        entry: uv lock --check
+        language: system
+        always_run: true
+        pass_filenames: false
+
+      - id: uv-sync
+        name: uv sync
+        entry: uv sync
+        language: system
+        always_run: true
+        pass_filenames: false
+        stages: [post-merge]
