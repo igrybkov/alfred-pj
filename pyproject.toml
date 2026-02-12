@@ -62,3 +62,31 @@ python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
 addopts = "-v --tb=short"
+
+[tool.semantic_release]
+commit_parser = "conventional"
+allow_zero_version = true
+tag_format = "v{version}"
+version_toml = ["pyproject.toml:project.version"]
+commit_message = "chore(release): v{version} [skip ci]"
+assets = ["info.plist", "uv.lock"]
+build_command = "uv lock && uv run bin/release.py sync-plist-version && uv run bin/release.py sync-defaults && mkdir -p dist && uv run bin/release.py package --output dist/alfred-pj.alfredworkflow"
+
+[tool.semantic_release.changelog]
+mode = "update"
+exclude_commit_patterns = [
+    '''Merge pull request.*''',
+    '''chore\(deps\):.*''',
+]
+
+[tool.semantic_release.changelog.default_templates]
+changelog_file = "CHANGELOG.md"
+output_format = "md"
+mask_initial_release = false
+
+[tool.semantic_release.remote]
+type = "github"
+
+[tool.semantic_release.publish]
+upload_to_vcs_release = true
+dist_glob_patterns = ["dist/*.alfredworkflow"]

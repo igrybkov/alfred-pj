@@ -266,6 +266,20 @@ def unlink():
     click.echo(f"Unlinked {link_path}")
 
 
+@cli.command("sync-plist-version")
+def sync_plist_version():
+    """Sync version from pyproject.toml to info.plist."""
+    content = PYPROJECT_PATH.read_text()
+    match = re.search(r'^version = "(.+)"', content, flags=re.MULTILINE)
+    if not match:
+        raise click.ClickException("Could not find version in pyproject.toml")
+    version = match.group(1)
+    plist = get_plist()
+    plist["version"] = version
+    write_plist(plist)
+    click.echo(f"Synced version {version} to info.plist")
+
+
 @cli.command("sync-defaults")
 @click.option(
     "--check",
