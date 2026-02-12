@@ -19,8 +19,14 @@ fi
 # Get the directory where this script is located
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Sync dependencies
-uv sync --project "$SCRIPT_DIR"
+# Sync dependencies only when uv.lock is newer than the venv or the venv is missing
+VENV_DIR="$SCRIPT_DIR/.venv"
+LOCK_FILE="$SCRIPT_DIR/uv.lock"
+PYVENV="$VENV_DIR/pyvenv.cfg"
+
+if [[ ! -f "$PYVENV" ]] || [[ "$LOCK_FILE" -nt "$PYVENV" ]]; then
+    uv sync --project "$SCRIPT_DIR"
+fi
 
 # Run the application
 uv run --project "$SCRIPT_DIR" alfred-pj "$@"
