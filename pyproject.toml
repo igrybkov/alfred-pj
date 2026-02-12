@@ -11,6 +11,9 @@ dependencies = [
     "click>=8.1.0",
 ]
 
+[project.optional-dependencies]
+build = ["uv~=0.10.0"]
+
 [project.scripts]
 alfred-pj = "alfred_pj.cli:cli"
 
@@ -70,7 +73,14 @@ tag_format = "v{version}"
 version_toml = ["pyproject.toml:project.version"]
 commit_message = "chore(release): v{version} [skip ci]"
 assets = ["info.plist", "uv.lock"]
-build_command = "uv lock && uv run bin/release.py sync-plist-version && uv run bin/release.py sync-defaults && mkdir -p dist && uv run bin/release.py package --output dist/alfred-pj.alfredworkflow"
+build_command = """
+    python -m pip install -e '.[build]'
+    uv lock --upgrade-package "$PACKAGE_NAME"
+    uv run bin/release.py sync-plist-version
+    uv run bin/release.py sync-defaults
+    mkdir -p dist
+    uv run bin/release.py package --output dist/alfred-pj.alfredworkflow
+"""
 
 [tool.semantic_release.changelog]
 mode = "update"
