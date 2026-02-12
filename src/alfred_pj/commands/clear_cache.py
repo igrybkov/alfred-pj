@@ -23,7 +23,7 @@ def clear_cache(usage: bool, alfred: bool):
 
     if alfred:
         # Alfred cache directory
-        cache_dir = os.getenv("alfred_workflow_cache")  # noqa: SIM112
+        cache_dir = os.getenv("alfred_workflow_cache")
         if cache_dir and os.path.isdir(cache_dir):
             shutil.rmtree(cache_dir)
             os.makedirs(cache_dir, exist_ok=True)

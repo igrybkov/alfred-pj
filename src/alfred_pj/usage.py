@@ -8,7 +8,7 @@ import tempfile
 class UsageData:
     def __init__(self):
         # alfred_workflow_data is set by Alfred in lowercase
-        alfred_data_dir = os.getenv("alfred_workflow_data")  # noqa: SIM112
+        alfred_data_dir = os.getenv("alfred_workflow_data")
         if not alfred_data_dir:
             # Fallback for running outside Alfred
             alfred_data_dir = os.path.join(tempfile.gettempdir(), "alfred-pj")

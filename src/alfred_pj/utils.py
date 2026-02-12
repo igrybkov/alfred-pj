@@ -35,11 +35,7 @@ class Logger(logging.Logger):
         super().__init__(name)
         self.addHandler(logging.StreamHandler(sys.stderr))
         # alfred_debug is set by Alfred in lowercase
-        self.setLevel(
-            logging.DEBUG
-            if os.environ.get("alfred_debug") == "1"  # noqa: SIM112
-            else logging.INFO
-        )
+        self.setLevel(logging.DEBUG if os.environ.get("alfred_debug") == "1" else logging.INFO)
         self.log(logging.INFO, "logger initiated")
 
 
