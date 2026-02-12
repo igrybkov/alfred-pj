@@ -133,6 +133,15 @@ def temp_usage_dir(tmp_path, monkeypatch):
 
 
 @pytest.fixture
+def temp_cache_dir(tmp_path, monkeypatch):
+    """Set up temporary cache directory."""
+    cache_dir = tmp_path / "alfred_cache"
+    cache_dir.mkdir()
+    monkeypatch.setenv("alfred_workflow_cache", str(cache_dir))
+    return cache_dir
+
+
+@pytest.fixture
 def projects_dir(tmp_path):
     """Create a directory with multiple project subdirectories."""
     projects = tmp_path / "projects"

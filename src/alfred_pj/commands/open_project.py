@@ -18,6 +18,11 @@ def open_project(path):
         usage.clear()
         usage.write_data()
         return
+    if path == "__CLEAR_CACHE__":
+        from alfred_pj.cache import CacheStore
+
+        CacheStore().clear()
+        return
     if not os.path.exists(path):
         raise click.BadParameter(f"Path '{path}' does not exist.", param_hint="'--path'")
     editor_cmd = Editors().determine_editor(path)

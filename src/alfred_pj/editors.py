@@ -117,17 +117,23 @@ EDITOR_DEFS = {
 
 
 class Editors:
-    def __init__(self):
+    def __init__(self, cache=None):
         self.default_editor = (
             os.environ["DEFAULT_EDITOR"]
             if ("DEFAULT_EDITOR" in os.environ and os.environ["DEFAULT_EDITOR"])
             else "code"
         )
         # Check editor availability in parallel for faster startup
-        self.editors = self._check_editors_availability()
+        self.editors = self._check_editors_availability(cache)
 
-    def _check_editors_availability(self) -> dict:
-        """Check all editors availability in parallel."""
+    def _check_editors_availability(self, cache=None) -> dict:
+        """Check all editors availability in parallel, with optional cache."""
+        if cache is not None:
+            cached = cache.get_editors()
+            if cached is not None:
+                logger.debug("editors loaded from cache")
+                return cached
+
         from concurrent.futures import ThreadPoolExecutor
 
         def check_editor(item: tuple) -> tuple:
@@ -137,7 +143,12 @@ class Editors:
         with ThreadPoolExecutor(max_workers=len(EDITOR_DEFS)) as executor:
             results = executor.map(check_editor, EDITOR_DEFS.items())
 
-        return dict(results)
+        result = dict(results)
+
+        if cache is not None:
+            cache.set_editors(result)
+
+        return result
 
     def get_editor(self, editor_code: str) -> dict:
         """Get editor info, dynamically adding unknown editors if available."""

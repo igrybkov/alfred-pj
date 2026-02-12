@@ -2,6 +2,7 @@
 
 import json
 
+import pytest
 from click.testing import CliRunner
 
 from alfred_pj.commands.list import list as list_cmd
@@ -9,6 +10,10 @@ from alfred_pj.commands.list import list as list_cmd
 
 class TestListCommand:
     """Tests for the list command."""
+
+    @pytest.fixture(autouse=True)
+    def _isolate_cache(self, temp_cache_dir):
+        """Ensure each test uses an isolated cache directory."""
 
     def test_lists_projects_from_path(self, projects_dir, temp_usage_dir):
         """Should list all project directories."""
@@ -105,9 +110,10 @@ class TestListCommand:
 
         assert result.exit_code == 0
         output = json.loads(result.output)
-        # Only the "Clear usage data" item should be present
-        assert len(output["items"]) == 1
-        assert output["items"][0]["arg"] == "__CLEAR_USAGE__"
+        # Only the two footer items should be present
+        assert len(output["items"]) == 2
+        assert output["items"][-2]["arg"] == "__CLEAR_USAGE__"
+        assert output["items"][-1]["arg"] == "__CLEAR_CACHE__"
 
     def test_only_lists_directories(self, tmp_path, temp_usage_dir):
         """Should only list directories, not files in the path."""
@@ -137,8 +143,8 @@ class TestListCommand:
 
         output = json.loads(result.output)
         for item in output["items"]:
-            # Skip the "Clear usage data" item
-            if item["arg"] == "__CLEAR_USAGE__":
+            # Skip footer items
+            if item["arg"].startswith("__"):
                 continue
             assert item["arg"].startswith(str(projects_dir))
 
@@ -152,9 +158,10 @@ class TestListCommand:
 
         assert result.exit_code == 0
         output = json.loads(result.output)
-        # Only the "Clear usage data" item should be present
-        assert len(output["items"]) == 1
-        assert output["items"][0]["arg"] == "__CLEAR_USAGE__"
+        # Only the two footer items should be present
+        assert len(output["items"]) == 2
+        assert output["items"][-2]["arg"] == "__CLEAR_USAGE__"
+        assert output["items"][-1]["arg"] == "__CLEAR_CACHE__"
 
     def test_requires_paths_option(self, temp_usage_dir):
         """Should require --paths option."""
@@ -165,17 +172,22 @@ class TestListCommand:
         assert "Missing option '--paths'" in result.output
 
     def test_clear_usage_item_at_end(self, projects_dir, temp_usage_dir):
-        """Should include 'Clear usage data' item at the end of the list."""
+        """Should include footer items at the end of the list."""
         runner = CliRunner()
         result = runner.invoke(list_cmd, ["--paths", str(projects_dir)])
 
         output = json.loads(result.output)
         items = output["items"]
 
-        # Last item should be "Clear usage data"
-        assert items[-1]["title"] == "> Clear usage data"
-        assert items[-1]["arg"] == "__CLEAR_USAGE__"
-        assert items[-1]["subtitle"] == "Reset project selection statistics"
+        # Second-to-last item should be "Clear usage data"
+        assert items[-2]["title"] == "> Clear usage data"
+        assert items[-2]["arg"] == "__CLEAR_USAGE__"
+        assert items[-2]["subtitle"] == "Reset project selection statistics"
+
+        # Last item should be "Clear cache"
+        assert items[-1]["title"] == "> Clear cache"
+        assert items[-1]["arg"] == "__CLEAR_CACHE__"
+        assert items[-1]["subtitle"] == "Clear project detection and editor availability caches"
 
     def test_skips_hidden_directories(self, tmp_path, temp_usage_dir):
         """Should skip directories starting with a dot."""
