@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.1.4 (2026-02-12)
+
+### Bug Fixes
+
+- **ci**: Stop uploading info.plist and uv.lock as release assets
+  ([`9dec360`](https://github.com/igrybkov/alfred-pj/commit/9dec360e0c78889705f4a428fa6667dc377deebf))
+
+
 ## v1.1.3 (2026-02-12)
 
 ### Bug Fixes
