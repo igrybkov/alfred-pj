@@ -72,12 +72,12 @@ allow_zero_version = true
 tag_format = "v{version}"
 version_toml = ["pyproject.toml:project.version"]
 commit_message = "chore(release): v{version} [skip ci]"
-assets = ["info.plist", "uv.lock"]
 build_command = """
     python -m pip install -e '.[build]'
     uv lock --upgrade-package "$PACKAGE_NAME"
     uv run bin/release.py sync-plist-version
     uv run bin/release.py sync-defaults
+    git add uv.lock info.plist
     mkdir -p dist
     uv run bin/release.py package --output dist/alfred-pj.alfredworkflow
 """
