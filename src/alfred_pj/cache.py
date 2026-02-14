@@ -3,13 +3,22 @@
 import contextlib
 import json
 import os
+import random
 import time
+
+# Per-editor TTL ranges (seconds)
+MISSING_TTL_RANGE = (24 * 3600, 48 * 3600)  # 24-48h for missing editors
+AVAILABLE_TTL_RANGE = (48 * 3600, 96 * 3600)  # 48-96h for available editors
+
+
+def _random_expiry(available: bool) -> float:
+    """Return a future timestamp with a randomized TTL based on availability."""
+    lo, hi = AVAILABLE_TTL_RANGE if available else MISSING_TTL_RANGE
+    return time.time() + random.uniform(lo, hi)
 
 
 class CacheStore:
     """Manages persistent caches for editor availability and project detection."""
-
-    EDITORS_TTL = 86400  # 24 hours
 
     def __init__(self):
         cache_dir = os.getenv("alfred_workflow_cache") or "/tmp/alfred-pj-cache"
@@ -22,19 +31,56 @@ class CacheStore:
     # --- Editor availability cache ---
 
     def get_editors(self) -> dict | None:
-        """Return cached editors dict if fresh, else None."""
+        """Return cached editors dict if file exists, else None.
+
+        Always returns cached data regardless of per-editor expiry —
+        stale entries are refreshed one-at-a-time via get_most_expired_editor().
+        """
         try:
             with open(self._editors_file) as f:
                 data = json.load(f)
-            if time.time() - data.get("timestamp", 0) < self.EDITORS_TTL:
-                return data["editors"]
+            return data["editors"]
         except (OSError, KeyError, json.JSONDecodeError):
             pass
         return None
 
     def set_editors(self, editors: dict) -> None:
-        """Atomically write editors cache."""
-        self._atomic_write(self._editors_file, {"timestamp": time.time(), "editors": editors})
+        """Bulk-write all editors with randomized per-editor expiry."""
+        stamped = {}
+        for code, info in editors.items():
+            stamped[code] = {**info, "expires_at": _random_expiry(info.get("available", False))}
+        self._atomic_write(self._editors_file, {"editors": stamped})
+
+    def get_most_expired_editor(self) -> str | None:
+        """Return the editor code whose expires_at is most overdue, or None if all fresh."""
+        try:
+            with open(self._editors_file) as f:
+                data = json.load(f)
+        except (OSError, json.JSONDecodeError):
+            return None
+
+        editors = data.get("editors", {})
+        if not editors:
+            return None
+
+        code = min(editors, key=lambda c: editors[c].get("expires_at", 0))
+        if editors[code].get("expires_at", 0) < time.time():
+            return code
+        return None
+
+    def update_editor(self, code: str, info: dict) -> None:
+        """Read-modify-write a single editor entry with a new random expiry."""
+        try:
+            with open(self._editors_file) as f:
+                data = json.load(f)
+        except (OSError, json.JSONDecodeError):
+            data = {"editors": {}}
+
+        data.setdefault("editors", {})[code] = {
+            **info,
+            "expires_at": _random_expiry(info.get("available", False)),
+        }
+        self._atomic_write(self._editors_file, data)
 
     # --- Project detection cache ---
 

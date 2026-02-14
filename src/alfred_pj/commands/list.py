@@ -85,3 +85,6 @@ def list(paths):
     )
     response["items"] = items
     print(json.dumps(response, default=lambda o: o.__dict__))
+
+    # Refresh one stale editor inline after output is printed (~5ms)
+    editors.refresh_stale_editor()

@@ -118,18 +118,19 @@ EDITOR_DEFS = {
 
 class Editors:
     def __init__(self, cache=None):
+        self._cache = cache
         self.default_editor = (
             os.environ["DEFAULT_EDITOR"]
             if ("DEFAULT_EDITOR" in os.environ and os.environ["DEFAULT_EDITOR"])
             else "code"
         )
         # Check editor availability in parallel for faster startup
-        self.editors = self._check_editors_availability(cache)
+        self.editors = self._check_editors_availability()
 
-    def _check_editors_availability(self, cache=None) -> dict:
+    def _check_editors_availability(self) -> dict:
         """Check all editors availability in parallel, with optional cache."""
-        if cache is not None:
-            cached = cache.get_editors()
+        if self._cache is not None:
+            cached = self._cache.get_editors()
             if cached is not None:
                 logger.debug("editors loaded from cache")
                 return cached
@@ -145,10 +146,23 @@ class Editors:
 
         result = dict(results)
 
-        if cache is not None:
-            cache.set_editors(result)
+        if self._cache is not None:
+            self._cache.set_editors(result)
 
         return result
+
+    def refresh_stale_editor(self) -> None:
+        """Re-check the single most overdue editor and update the cache."""
+        if self._cache is None:
+            return
+        code = self._cache.get_most_expired_editor()
+        if code is None:
+            return
+        logger.debug(f"refreshing stale editor: {code}")
+        base = EDITOR_DEFS.get(code, {"name": code, "icon": {"path": "icon.png"}})
+        info = {**base, "available": bool(which(code))}
+        self.editors[code] = info
+        self._cache.update_editor(code, info)
 
     def get_editor(self, editor_code: str) -> dict:
         """Get editor info, dynamically adding unknown editors if available."""

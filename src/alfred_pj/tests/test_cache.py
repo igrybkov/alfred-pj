@@ -1,7 +1,6 @@
 """Tests for CacheStore."""
 
 import json
-import time
 
 import pytest
 
@@ -21,29 +20,37 @@ class TestEditorCache:
         assert cache.get_editors() is None
 
     def test_get_editors_returns_cached_when_fresh(self, cache):
-        """Fresh timestamp → returns stored dict."""
+        """Cache file exists → returns stored dict (always, regardless of expiry)."""
         editors = {"code": {"name": "VS Code", "available": True}}
         cache.set_editors(editors)
         result = cache.get_editors()
-        assert result == editors
+        assert result["code"]["name"] == "VS Code"
+        assert result["code"]["available"] is True
+        assert "expires_at" in result["code"]
 
-    def test_get_editors_returns_none_when_stale(self, cache):
-        """Expired timestamp → None."""
-        editors = {"code": {"name": "VS Code", "available": True}}
-        # Write with a timestamp that is older than TTL
-        stale_data = {"timestamp": time.time() - CacheStore.EDITORS_TTL - 1, "editors": editors}
+    def test_get_editors_always_returns_data_when_file_exists(self, cache):
+        """Even with expired entries, get_editors returns data (stale refresh is separate)."""
+        editors = {"code": {"name": "VS Code", "available": True, "expires_at": 0}}
         with open(cache._editors_file, "w") as f:
-            json.dump(stale_data, f)
-        assert cache.get_editors() is None
+            json.dump({"editors": editors}, f)
+        result = cache.get_editors()
+        assert result["code"]["name"] == "VS Code"
 
     def test_set_and_get_editors_roundtrip(self, cache):
-        """set_editors followed by get_editors returns the same data."""
+        """set_editors followed by get_editors preserves editor info with added expiry."""
         editors = {
             "code": {"name": "VS Code", "available": True},
             "pycharm": {"name": "PyCharm", "available": False},
         }
         cache.set_editors(editors)
-        assert cache.get_editors() == editors
+        result = cache.get_editors()
+        assert result["code"]["name"] == "VS Code"
+        assert result["code"]["available"] is True
+        assert result["pycharm"]["name"] == "PyCharm"
+        assert result["pycharm"]["available"] is False
+        # Each editor gets its own expiry
+        assert "expires_at" in result["code"]
+        assert "expires_at" in result["pycharm"]
 
 
 class TestProjectCache:
