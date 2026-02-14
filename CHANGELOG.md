@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.1.5 (2026-02-14)
+
+### Performance Improvements
+
+- **cache**: Stagger editor availability checks with per-editor expiry
+  ([`d776c7b`](https://github.com/igrybkov/alfred-pj/commit/d776c7b17a0ec8080f3b37dd1dd93816e4e8e09a))
+
+
 ## v1.1.4 (2026-02-12)
 
 ### Bug Fixes
