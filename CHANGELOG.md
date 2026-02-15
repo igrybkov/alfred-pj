@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.1.6 (2026-02-15)
+
+### Bug Fixes
+
+- **ci**: Use single Python version from .python-version instead of matrix
+  ([`5f57673`](https://github.com/igrybkov/alfred-pj/commit/5f57673223d9290279250b6639ee948437b01019))
+
+
 ## v1.1.5 (2026-02-14)
 
 ### Performance Improvements
