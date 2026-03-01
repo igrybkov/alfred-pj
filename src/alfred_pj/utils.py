@@ -12,6 +12,7 @@ FALLBACK_SEARCH_PATHS = [
     "/opt/homebrew/sbin",
     "/usr/local/bin",
     Path.home() / ".local/bin",
+    "/Applications/Obsidian.app/Contents/MacOS",
 ]
 
 

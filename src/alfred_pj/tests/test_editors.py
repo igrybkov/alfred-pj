@@ -13,7 +13,7 @@ class TestEditorDetection:
         editors = Editors()
         result = editors.determine_editor(str(obsidian_vault))
         # Obsidian may not be available, so it falls back to default
-        assert result in ("obsidian", editors.default_editor)
+        assert result in ("obsidian-opener", "obsidian", editors.default_editor)
 
     def test_detect_vscode_project(self, vscode_project):
         """Directory with .vscode (without .idea) should detect as code."""

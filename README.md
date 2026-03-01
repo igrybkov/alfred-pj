@@ -60,6 +60,7 @@ Configure your preferred editors using environment variables. Editors are comma-
 | Variable | Project Type | Default |
 |----------|--------------|---------|
 | `DEFAULT_EDITOR` | Fallback for unknown types | `code` |
+| `EDITORS_OBSIDIAN` | Obsidian vaults | `obsidian-opener,obsidian` |
 | `EDITORS_PYTHON` | Python projects | `pycharm,idea,code` |
 | `EDITORS_JAVASCRIPT` | JavaScript projects | `webstorm,phpstorm,idea,code` |
 | `EDITORS_TYPESCRIPT` | TypeScript projects | `webstorm,code` |

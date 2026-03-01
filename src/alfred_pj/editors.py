@@ -11,7 +11,8 @@ DETECTORS = [
     {
         "name": "obsidian",
         "dirs": [".obsidian"],
-        "editors": ["obsidian"],
+        "env": "EDITORS_OBSIDIAN",
+        "editors": ["obsidian-opener", "obsidian"],
     },
     # # VS Code project (explicit .vscode, no .idea)
     {

@@ -9,6 +9,11 @@ if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
     export PATH="$HOME/.local/bin:$PATH"
 fi
 
+# Add Obsidian CLI to PATH (official CLI bundled with Obsidian.app)
+if [[ ":$PATH:" != *":/Applications/Obsidian.app/Contents/MacOS:"* ]]; then
+    export PATH="$PATH:/Applications/Obsidian.app/Contents/MacOS"
+fi
+
 # Check if uv is available, install if not
 if ! command -v uv &> /dev/null; then
     echo "uv not found, installing to ~/.local/bin..." >&2

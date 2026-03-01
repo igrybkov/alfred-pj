@@ -71,5 +71,5 @@ The `Editors.determine_editor()` method uses this priority:
 
 Environment variables for editor preferences (comma-separated, first available is used):
 - `DEFAULT_EDITOR`: Fallback editor (default: `code`)
-- `EDITORS_PHP`, `EDITORS_JAVA`, `EDITORS_PYTHON`, `EDITORS_JUPYTER`
+- `EDITORS_OBSIDIAN`, `EDITORS_PHP`, `EDITORS_JAVA`, `EDITORS_PYTHON`, `EDITORS_JUPYTER`
 - `EDITORS_JAVASCRIPT`, `EDITORS_GO`, `EDITORS_RUST`

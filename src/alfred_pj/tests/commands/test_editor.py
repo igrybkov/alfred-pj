@@ -71,7 +71,7 @@ class TestEditorCommand:
 
         assert result.exit_code == 0
         # Obsidian vaults should use obsidian (or fallback to default)
-        assert result.output.strip() in ["obsidian", "code"]
+        assert result.output.strip() in ["obsidian-opener", "obsidian", "code"]
 
     def test_fallback_for_unknown_project(self, temp_project):
         """Should fallback to default editor for unknown project type."""
