@@ -2,6 +2,19 @@
 
 <!-- version list -->
 
+## v1.2.0 (2026-03-02)
+
+### Continuous Integration
+
+- **cd**: Switch to weekly scheduled releases with manual trigger
+  ([`1433ad3`](https://github.com/igrybkov/alfred-pj/commit/1433ad346ec593218dd77085a89e7c65c123e92f))
+
+### Features
+
+- **obsidian**: Add official Obsidian CLI support with configurable editor
+  ([`e909e15`](https://github.com/igrybkov/alfred-pj/commit/e909e1525da7f29943c246ba4a8f817d80177b93))
+
+
 ## v1.1.6 (2026-02-15)
 
 ### Bug Fixes
