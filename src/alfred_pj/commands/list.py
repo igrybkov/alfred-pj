@@ -50,7 +50,7 @@ def list(paths):
         if editor_code is None:
             editor_code = editors.determine_editor(path)
             cache.set_project(path, editor_code, mtime)
-        editor_info = editors.editors[editor_code]
+        editor_info = editors.get_editor(editor_code)
         logger.debug(f"editor for {path} is {editor_info['name'] if editor_info else editor_code}")
         displayPath = path.replace(home, "~", 1)
         return ResponseItem(
