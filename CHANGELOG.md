@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.2.1 (2026-03-09)
+
+### Bug Fixes
+
+- **list**: Use get_editor() to avoid KeyError on cached editor codes
+  ([`e08fc99`](https://github.com/igrybkov/alfred-pj/commit/e08fc9991cbb274fccc1f932fe9c01c7f7835598))
+
+
 ## v1.2.0 (2026-03-02)
 
 ### Continuous Integration
