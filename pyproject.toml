@@ -12,7 +12,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-build = ["uv~=0.10.0"]
+build = ["uv~=0.11.1"]
 
 [project.scripts]
 alfred-pj = "alfred_pj.cli:cli"
