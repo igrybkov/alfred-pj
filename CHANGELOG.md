@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.2.2 (2026-03-30)
+
+### Bug Fixes
+
+- **deps**: Update dependency uv to ~=0.11.1
+  ([`a1584b8`](https://github.com/igrybkov/alfred-pj/commit/a1584b8638c851e5b92253263eb78b2dbe61619e))
+
+
 ## v1.2.1 (2026-03-09)
 
 ### Bug Fixes
