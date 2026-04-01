@@ -18,7 +18,7 @@ build = ["uv~=0.11.1"]
 alfred-pj = "alfred_pj.cli:cli"
 
 [build-system]
-requires = ["uv_build>=0.10.2,<0.11.0"]
+requires = ["uv_build>=0.11.3,<0.12.0"]
 build-backend = "uv_build"
 
 [dependency-groups]
